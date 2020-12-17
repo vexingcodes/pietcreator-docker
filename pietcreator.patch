@@ -1,0 +1,47 @@
+diff --git a/npiet/npiet.c b/npiet/npiet.c
+index d3cf3f7..1341a0e 100644
+--- a/npiet/npiet.c
++++ b/npiet/npiet.c
+@@ -1175,7 +1175,7 @@ read_gif (char *fname)
+   GifFileType *gif;
+   GifRecordType rtype;
+   GifColorType *gcol;
+-  int i, j, width, height, col_idx;
++  int i, j, width, height, col_idx, error_code;
+ 
+   if (! strcmp (fname, "-")) {
+     /* read from stdin: */
+@@ -1183,21 +1183,20 @@ read_gif (char *fname)
+     return -1;
+   }
+ 
+-  if (! (gif = DGifOpenFileName (fname))) {
++  if (! (gif = DGifOpenFileName (fname, &error_code))) {
+     /* return error silently: */
+     return -1;
+   }
+   
+   if (DGifGetRecordType (gif, &rtype) == GIF_ERROR) {
+-    PrintGifError ();
+-    DGifCloseFile (gif);
++    DGifCloseFile (gif, &error_code);
+     return -1;
+   }
+ 
+   if (rtype != IMAGE_DESC_RECORD_TYPE 
+       || DGifGetImageDesc (gif) == GIF_ERROR) {
+     fprintf (stderr, "error: unknown gif format - exiting\n");
+-    DGifCloseFile (gif);
++    DGifCloseFile (gif, &error_code);
+     exit (-1);
+   }
+ 
+@@ -1263,7 +1262,7 @@ read_gif (char *fname)
+     }
+   }
+ 
+-  DGifCloseFile (gif);
++  DGifCloseFile (gif, &error_code);
+ 
+   return 0;
+ }
